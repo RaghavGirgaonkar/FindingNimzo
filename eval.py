@@ -1,13 +1,14 @@
 import chess
+from hyperparameters import *
 
-PIECE_VALUES = {'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 10000}
 
 def evaluate_board(board):
     white_pieces = {'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0, 'k': 0}
     black_pieces = {'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0, 'k': 0}
+    PIECE_MAP = board.piece_map();
 
     if board.is_checkmate():
-        return -10000 if board.turn else 10000
+        return -GAME_LOSS_SCORE if board.turn else GAME_LOSS_SCORE
     if board.is_stalemate():
         return 0
     if board.is_insufficient_material():
@@ -27,6 +28,23 @@ def evaluate_board(board):
     black_pieces['q'] = len(board.pieces(chess.QUEEN, chess.BLACK))
     black_pieces['k'] = len(board.pieces(chess.KING, chess.BLACK))
 
+    for key in PIECE_MAP.keys():
+        piece = PIECE_MAP[key].symbol()
+        match piece:
+            case 'P':
+            case 'p':
+            case 'N':
+            case 'n':
+            case 'B':
+            case 'b':
+            case 'R':
+            case 'r':
+            case 'Q':
+            case 'q':
+            case 'K':
+            case 'k':
+    
+
     material_score = PIECE_VALUES['p'] * (white_pieces['p'] - black_pieces['p']) + \
                      PIECE_VALUES['n'] * (white_pieces['n'] - black_pieces['n']) + \
                      PIECE_VALUES['b'] * (white_pieces['b'] - black_pieces['b']) + \
@@ -44,6 +62,6 @@ def evaluate_board(board):
     return material_score + 0.1 * mobility_score
 
 if __name__ == '__main__':
-    board = chess.Board('r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 4')
+    board = chess.Board('rnbqkbnr/ppppp1pp/8/5p2/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2')
     eval = evaluate_board(board)
     print(eval)
