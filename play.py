@@ -1,7 +1,7 @@
 import chess
 from search import alpha_beta_pruning_search
 
-search_depth = 5
+search_depth = 4
 
 def play():
     board = chess.Board()

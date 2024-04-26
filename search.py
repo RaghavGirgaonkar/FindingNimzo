@@ -71,6 +71,7 @@ def alpha_beta_pruning_search(board, depth, alpha, beta, is_maximizing):
 
         return min_eval, best_move
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Chess AI')
     parser.add_argument('depth', type=int, help='Search depth')
