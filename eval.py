@@ -71,10 +71,13 @@ def evaluate_board(board):
     board.turn = False
     mobility_score -= len(list(board.legal_moves))
     board.turn = turn
+
+    eval = material_score + 0.1 * mobility_score + bonus_score
     
-    return material_score + 0.1 * mobility_score + 0.08 * bonus_score
+    return eval
 
 if __name__ == '__main__':
-    board = chess.Board('rnbqkbnr/ppppp1pp/8/5p2/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2')
+    # board = chess.Board('rnbqkbnr/ppppp1pp/8/5p2/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2')
+    board = chess.Board('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
     eval = evaluate_board(board)
     print(eval)

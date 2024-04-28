@@ -35,8 +35,15 @@ def minimax_search(board, depth, is_maximizing):
         return min_eval, best_move
     
 def alpha_beta_pruning_search(board, depth, alpha, beta, is_maximizing):
+    '''
+    Basic alpha-beta pruning search function
+    '''
     if depth == 0 or board.is_game_over():
         return evaluate_board(board), None
+
+    # if depth == 0:
+    #     eval, best_move = quiescence_search(board, alpha, beta, is_maximizing)
+    #     return eval, best_move
 
     if is_maximizing:
         max_eval = -9999
@@ -70,6 +77,51 @@ def alpha_beta_pruning_search(board, depth, alpha, beta, is_maximizing):
                 break
 
         return min_eval, best_move
+
+def quiescence_search(board, alpha, beta, is_maximizing):
+    '''
+    After reaching depth limit, Search all capture moves until a quiet position is found.
+    '''
+    # #Get all capture moves
+    # capture_moves = []
+    # for move in board.legal_moves:
+    #     if board.is_capture(move):
+    #         capture_moves.append(move)
+    # return capture_moves
+
+    if is_maximizing:
+        max_eval = -9999
+        best_move = None
+
+        for move in board.legal_moves:
+            board.push(move)
+            eval, _ = quiescence_search(board, alpha, beta, False)
+            board.pop()
+            if eval > max_eval:
+                max_eval = eval
+                best_move = move
+            alpha = max(alpha, eval)
+            if beta <= alpha:
+                break
+
+        return max_eval, best_move
+    else:
+        min_eval = 9999
+        best_move = None
+
+        for move in board.legal_moves:
+            board.push(move)
+            eval, _ = quiescence_search(board, alpha, beta, True)
+            board.pop()
+            if eval < min_eval:
+                min_eval = eval
+                best_move = move
+            beta = min(beta, eval)
+            if beta <= alpha:
+                break
+
+        return min_eval, best_move
+
 
 
 if __name__ == '__main__':
