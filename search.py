@@ -34,12 +34,18 @@ def minimax_search(board, depth, is_maximizing):
 
         return min_eval, best_move
     
-def alpha_beta_pruning_search(board, depth, alpha, beta, is_maximizing):
+def alpha_beta_pruning_search(board, transposition_table, depth, alpha, beta, is_maximizing):
     '''
     Basic alpha-beta pruning search function
     '''
     if depth == 0 or board.is_game_over():
-        return evaluate_board(board), None
+        hash = board.fen()
+        if hash in transposition_table:
+            return transposition_table[hash], None
+        else:
+            eval = evaluate_board(board)
+            transposition_table[hash] = eval
+            return eval, None
 
     # if depth == 0:
     #     eval, best_move = quiescence_search(board, alpha, beta, is_maximizing)
@@ -51,7 +57,7 @@ def alpha_beta_pruning_search(board, depth, alpha, beta, is_maximizing):
 
         for move in board.legal_moves:
             board.push(move)
-            eval, _ = alpha_beta_pruning_search(board, depth - 1, alpha, beta, False)
+            eval, _ = alpha_beta_pruning_search(board, transposition_table, depth - 1, alpha, beta, False)
             board.pop()
             if eval > max_eval:
                 max_eval = eval
@@ -67,7 +73,7 @@ def alpha_beta_pruning_search(board, depth, alpha, beta, is_maximizing):
 
         for move in board.legal_moves:
             board.push(move)
-            eval, _ = alpha_beta_pruning_search(board, depth - 1, alpha, beta, True)
+            eval, _ = alpha_beta_pruning_search(board, transposition_table, depth - 1, alpha, beta, True)
             board.pop()
             if eval < min_eval:
                 min_eval = eval
@@ -130,11 +136,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     search_depth = args.depth
 
-    board = chess.Board('5r2/4qp2/2n1p3/3p4/5kPN/3r3Q/7P/4R1K1 w - - 0 40')
+    board = chess.Board('r3k2r/ppp2ppp/2n5/3qP3/6b1/2P3P1/PPP4P/R4RK1 b kq - 1 15')
 
     start_time = time.time()
-    eval, best_move = alpha_beta_pruning_search(board, search_depth, -9999, 9999, True)
+    transposition_table = {}
+    eval, best_move = alpha_beta_pruning_search(board, transposition_table, search_depth, -9999, 9999, True)
     end_time = time.time()
-
+    print("Number of keys in transposition table: ", len(transposition_table))
+    
     print(eval, best_move)
-    print('Time taken {}, with depth {}:'.format(end_time - start_time, search_depth))
+    print('Time taken {}, with depth {}'.format(end_time - start_time, search_depth))

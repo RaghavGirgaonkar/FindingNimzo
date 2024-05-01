@@ -77,7 +77,6 @@ def evaluate_board(board):
     return eval
 
 if __name__ == '__main__':
-    # board = chess.Board('rnbqkbnr/ppppp1pp/8/5p2/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2')
-    board = chess.Board('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+    board = chess.Board('r3k2r/ppp2ppp/2n5/3qP3/6b1/2P3P1/PPP4P/R4RK1 b kq - 1 15')
     eval = evaluate_board(board)
     print(eval)
