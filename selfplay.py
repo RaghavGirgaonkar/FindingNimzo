@@ -4,6 +4,9 @@ from search import *
 from eval import *
 import argparse
 import pickle
+import random
+
+opening_book = chess.polyglot.open_reader('bookfish.bin')
 
 def selfplay(search_depth, transposition_table, verbose=0):
     board = chess.Board()
@@ -17,24 +20,38 @@ def selfplay(search_depth, transposition_table, verbose=0):
             print('Position Eval:', position_eval)
 
         if board.turn == chess.WHITE:
-            print('White is thinking...')
-            # move_eval, move = alpha_beta_pruning_search(board, search_depth, -9999, 9999, False)
-            move_eval, move = alpha_beta_negamax_search(board, transposition_table,search_depth, -9999, 9999, 1)
-            board.push(move)
+            book_moves = [entry.move for entry in opening_book.find_all(board)]
+            if book_moves:
+                print('White is in book...')
+                move = random.choice(book_moves)
+                board.push(move)
+            else:
+                print('White is thinking...')
+                move_eval, move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999, 1)
+                board.push(move)
+
             if verbose:
                 position_eval = evaluate_board(board)
                 print('Position Eval:', position_eval)
             print('White moves:', move)
                 
-            move_number += 1
         else:
-            print('Black is thinking...')
-            move_eval, move = alpha_beta_negamax_search(board, transposition_table,search_depth, -9999, 9999,  -1)
-            board.push(move)
+            book_moves = [entry.move for entry in opening_book.find_all(board)]
+            if book_moves:
+                print('Black is in book...')
+                move = random.choice(book_moves)
+                board.push(move)
+            else:
+                print('Black is thinking...')
+                move_eval, move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999,  -1)
+                board.push(move)
+
             if verbose:
                 position_eval = evaluate_board(board)
                 print('Position Eval:', position_eval)
             print('Black moves:', move)
+
+            move_number += 1
             
    
     print('----------------')
