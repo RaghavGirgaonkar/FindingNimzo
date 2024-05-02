@@ -3,6 +3,7 @@ from hyperparameters import *
 from moveOrdering import *
 import argparse
 import chess
+import chess.polyglot
 import time
 
 def minimax_search(board, depth, is_maximizing):

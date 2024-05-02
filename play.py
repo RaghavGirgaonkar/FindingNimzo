@@ -1,4 +1,5 @@
 import chess
+import chess.polyglot
 from search import *
 from eval import *
 import argparse
