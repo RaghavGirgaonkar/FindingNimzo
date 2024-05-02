@@ -2,6 +2,7 @@ import chess
 from search import *
 from eval import *
 import argparse
+import pickle
 
 def play(search_depth, color, transposition_table, verbose=0):
 
@@ -28,6 +29,8 @@ def play(search_depth, color, transposition_table, verbose=0):
             move_number += 1
         else:
             move = input('Enter move: ')
+            if move == 'exit':
+                break
             try:
                 board.push_san(move)
                 if verbose:
@@ -57,10 +60,23 @@ if __name__ == '__main__':
     parser.add_argument('--verbose', type=int, default=1, help='Verbose mode')
                         
     args = parser.parse_args()
+    
+    # load transposition table
     transposition_table = {}
+    try:
+        with open('transposition_table.pkl', 'rb') as f:
+            transposition_table = pickle.load(f)
+    except:
+        pass
+
     if args.color == 'white':
         play(args.depth, chess.WHITE, transposition_table, args.verbose)
     elif args.color == 'black':
         play(args.depth, chess.BLACK, transposition_table, args.verbose)
     else:
         print('Invalid color!')
+    
+    # save transposition table
+    with open('transposition_table.pkl', 'wb') as f:
+        pickle.dump(transposition_table, f)
+

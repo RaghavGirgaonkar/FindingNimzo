@@ -41,7 +41,7 @@ def alpha_beta_pruning_search(board, transposition_table, depth, alpha, beta, is
     Basic alpha-beta pruning search function
     '''
     if depth == 0 or board.is_game_over():
-        hash = board.fen()
+        hash = chess.polyglot.zobrist_hash(board)
         if hash in transposition_table:
             return transposition_table[hash], None
         else:
