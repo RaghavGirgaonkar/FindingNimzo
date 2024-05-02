@@ -72,7 +72,7 @@ def evaluate_board(board):
     mobility_score -= len(list(board.legal_moves))
     board.turn = turn
 
-    eval = material_score + 0.1 * mobility_score + bonus_score
+    eval = material_score + 0.1 * mobility_score + 0.3*bonus_score
     
     return eval
 

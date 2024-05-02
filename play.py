@@ -1,9 +1,10 @@
 import chess
-from search import alpha_beta_pruning_search
+from search import *
 from eval import *
 import argparse
 
-def play(search_depth, color, verbose=0):
+def play(search_depth, color, transposition_table, verbose=0):
+
     board = chess.Board()
     move_number = 1
     while not board.is_game_over():
@@ -16,7 +17,8 @@ def play(search_depth, color, verbose=0):
 
         if board.turn == color:
             print('Computer is thinking...')
-            move_eval, move = alpha_beta_pruning_search(board, search_depth, -9999, 9999, False)
+            # move_eval, move = alpha_beta_pruning_search(board, search_depth, -9999, 9999, False)
+            move_eval, move = alpha_beta_negamax_search(board, transposition_table,search_depth, -9999, 9999, 1 if color else -1)
             board.push(move)
             if verbose:
                 position_eval = evaluate_board(board)
@@ -36,13 +38,16 @@ def play(search_depth, color, verbose=0):
                 continue
    
     print('----------------')
+    
     print(board)
+
     if board.is_checkmate():
         print('Checkmate!')
     elif board.is_stalemate():
         print('Stalemate!')
     elif board.is_insufficient_material():
         print('Insufficient material!')
+
 
 
 if __name__ == '__main__':
@@ -52,9 +57,10 @@ if __name__ == '__main__':
     parser.add_argument('--verbose', type=int, default=1, help='Verbose mode')
                         
     args = parser.parse_args()
+    transposition_table = {}
     if args.color == 'white':
-        play(args.depth, chess.WHITE, args.verbose)
+        play(args.depth, chess.WHITE, transposition_table, args.verbose)
     elif args.color == 'black':
-        play(args.depth, chess.BLACK, args.verbose)
+        play(args.depth, chess.BLACK, transposition_table, args.verbose)
     else:
         print('Invalid color!')

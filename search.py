@@ -1,4 +1,6 @@
 from eval import evaluate_board
+from hyperparameters import *
+from moveOrdering import *
 import argparse
 import chess
 import time
@@ -84,6 +86,46 @@ def alpha_beta_pruning_search(board, transposition_table, depth, alpha, beta, is
 
         return min_eval, best_move
 
+def alpha_beta_negamax_search(board, transposition_table, depth, alpha, beta, turnMultiplier):
+    '''
+    A cleaner implementation of an alpha beta pruning minimax search
+    '''
+    if depth == 0 or board.is_game_over():
+        hash = board.fen()
+        if hash in transposition_table:
+            return transposition_table[hash], None
+        else:
+            eval = turnMultiplier*evaluate_board(board)
+            transposition_table[hash] = eval
+            return eval, None
+
+    # if depth == 0:
+    #     eval, best_move = quiescence_search(board, alpha, beta, is_maximizing)
+    #     return eval, best_move
+
+    maxScore = -GAME_LOSS_SCORE
+    best_move = None  # Initialize best_move 
+    all_legal_moves = board.legal_moves
+    sorted_moves = order_moves(board,all_legal_moves,None)
+
+    for move in sorted_moves:
+        board.push(move)
+        eval, _ = alpha_beta_negamax_search(board, transposition_table, depth -1, -beta, -alpha, -turnMultiplier)
+        eval *= -1
+        board.pop()
+        if eval > maxScore:
+            maxScore = eval
+            best_move = move
+            #Pruning
+        if maxScore > alpha:
+            alpha = maxScore
+        if alpha >= beta:
+            break
+
+    return maxScore, best_move
+
+
+
 def quiescence_search(board, alpha, beta, is_maximizing):
     '''
     After reaching depth limit, Search all capture moves until a quiet position is found.
@@ -141,8 +183,18 @@ if __name__ == '__main__':
     start_time = time.time()
     transposition_table = {}
     eval, best_move = alpha_beta_pruning_search(board, transposition_table, search_depth, -9999, 9999, True)
+    # eval, best_move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999, 1)
     end_time = time.time()
     print("Number of keys in transposition table: ", len(transposition_table))
     
     print(eval, best_move)
     print('Time taken {}, with depth {}'.format(end_time - start_time, search_depth))
+    start_time = time.time()
+    transposition_table = {}
+    # eval, best_move = alpha_beta_pruning_search(board, transposition_table, search_depth, -9999, 9999, True)
+    eval, best_move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999, 1)
+    end_time = time.time()
+    print("Number of keys in transposition table: ", len(transposition_table))
+    
+    print(eval, best_move)
+    print('Nega Max Search Time taken {}, with depth {}'.format(end_time - start_time, search_depth))
