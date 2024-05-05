@@ -172,9 +172,9 @@ def alpha_beta_negamax_search(board, transposition_table, depth, alpha, beta, tu
             maxScore = eval
             best_move = move
             #Pruning
-        if maxScore >= alpha:
+        if maxScore > alpha:
             alpha = maxScore
-        if alpha >= beta:
+        if alpha > beta:
             break
 
     return maxScore, best_move
