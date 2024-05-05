@@ -31,7 +31,8 @@ def play(search_depth, color, transposition_table, verbose=0):
                 board.push(move)
             else:
                 print('Computer is thinking...')
-                move_eval, move = alpha_beta_negamax_search(board, transposition_table,search_depth, -9999, 9999, 1 if color else -1)
+                # move_eval, move = alpha_beta_negamax_search(board, transposition_table,search_depth, -9999, 9999, 1 if color else -1)
+                move_eval, move = iterative_deepening_search(board, transposition_table,search_depth,1 if color else -1)
                 board.push(move)
                 
             if verbose:

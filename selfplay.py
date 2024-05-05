@@ -23,7 +23,7 @@ def selfplay(search_depth, transposition_table, verbose=0):
             print('Position Eval:', position_eval)
 
         if board.turn == chess.WHITE:
-            time.sleep(2)
+            time.sleep(1)
             book_moves = [entry.move for entry in opening_book.find_all(board)]
             if book_moves:
                 print('White is in book...')
@@ -40,7 +40,7 @@ def selfplay(search_depth, transposition_table, verbose=0):
             print('White moves:', move)
                 
         else:
-            time.sleep(2)
+            time.sleep(1)
             book_moves = [entry.move for entry in opening_book.find_all(board)]
             if book_moves:
                 print('Black is in book...')

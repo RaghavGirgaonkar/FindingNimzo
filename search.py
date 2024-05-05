@@ -37,7 +37,7 @@ def minimax_search(board, depth, is_maximizing):
 
         return min_eval, best_move
     
-def quiescence_search(board, alpha, beta, is_maximizing):
+def quiescence_search(board, alpha, beta, turnMultiplier):
     '''
     After reaching depth limit, Search all capture moves until a quiet position is found.
     '''
@@ -46,40 +46,34 @@ def quiescence_search(board, alpha, beta, is_maximizing):
     for move in board.legal_moves:
         if board.is_capture(move):
             capture_moves.append(move)
-    return capture_moves
 
-    if is_maximizing:
-        max_eval = -9999
-        best_move = None
+    stand_pat = turnMultiplier * evaluate_board(board)
 
-        for move in capture_moves:
-            board.push(move)
-            eval, _ = quiescence_search(board, alpha, beta, False)
-            board.pop()
-            if eval > max_eval:
-                max_eval = eval
-                best_move = move
-            alpha = max(alpha, eval)
-            if beta <= alpha:
-                break
+    if stand_pat >= beta:
+        return beta, None
+    if alpha < stand_pat:
+        alpha = stand_pat
 
-        return max_eval, best_move
-    else:
-        min_eval = 9999
-        best_move = None
+    maxScore = -GAME_LOSS_SCORE
+    best_move = None
 
-        for move in capture_moves:
-            board.push(move)
-            eval, _ = quiescence_search(board, alpha, beta, True)
-            board.pop()
-            if eval < min_eval:
-                min_eval = eval
-                best_move = move
-            beta = min(beta, eval)
-            if beta <= alpha:
-                break
+    for move in capture_moves:
+        board.push(move)
+        score, _ = quiescence_search(board, -beta, -alpha, -turnMultiplier)
+        score *= -1
+        board.pop()
 
-        return min_eval, best_move
+        if score >= beta:
+            return beta, move
+        if score > maxScore:
+            maxScore = score
+            best_move = move
+        if score > alpha:
+            alpha = score
+
+    
+
+    return maxScore, best_move
 
 def alpha_beta_pruning_search(board, transposition_table, depth, alpha, beta, is_maximizing):
     '''
@@ -144,8 +138,22 @@ def alpha_beta_negamax_search(board, transposition_table, depth, alpha, beta, tu
             transposition_table[hash] = eval
             return eval, None
 
-    # if depth == 0:
-    #     eval, best_move = quiescence_search(board, alpha, beta, is_maximizing)
+    if board.is_game_over():
+        hash = chess.polyglot.zobrist_hash(board)
+        eval = turnMultiplier*evaluate_board(board)
+        transposition_table[hash] = eval
+        return eval, None
+
+    if depth == 0:
+        hash = chess.polyglot.zobrist_hash(board)
+        if hash not in transposition_table:
+            eval = turnMultiplier*evaluate_board(board)
+            transposition_table[hash] = eval
+            eval, best_move = quiescence_search(board, alpha, beta, turnMultiplier) 
+            
+
+    # if depth <= 1:  # Apply quiescence search at lower depths
+    #     eval, best_move = quiescence_search(board, alpha, beta, turnMultiplier)
     #     return eval, best_move
 
     maxScore = -GAME_LOSS_SCORE
@@ -169,6 +177,14 @@ def alpha_beta_negamax_search(board, transposition_table, depth, alpha, beta, tu
 
     return maxScore, best_move
 
+def iterative_deepening_search(board, transposition_table, max_depth, turnMultiplier):
+    best_move = None
+    for depth in range(1, max_depth):
+        eval, best_move = alpha_beta_negamax_search(board, transposition_table, depth, -9999, 9999, turnMultiplier)
+        # print("Depth:", depth, "Eval:", eval, "Best Move:", best_move)
+    return eval, best_move
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Chess AI')
     parser.add_argument('depth', type=int, help='Search depth')
@@ -186,12 +202,21 @@ if __name__ == '__main__':
     
     print(eval, best_move)
     print('Time taken {}, with depth {}'.format(end_time - start_time, search_depth))
+    # start_time = time.time()
+    # transposition_table = {}
+    # # eval, best_move = alpha_beta_pruning_search(board, transposition_table, search_depth, -9999, 9999, True)
+    # eval, best_move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999, 1)
+    # end_time = time.time()
+    # print("Number of keys in transposition table: ", len(transposition_table))
+    
+    # print(eval, best_move)
+    # print('Nega Max Search Time taken {}, with depth {}'.format(end_time - start_time, search_depth))
     start_time = time.time()
     transposition_table = {}
     # eval, best_move = alpha_beta_pruning_search(board, transposition_table, search_depth, -9999, 9999, True)
-    eval, best_move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999, 1)
+    eval, best_move = iterative_deepening_search(board, transposition_table, search_depth, 1)
     end_time = time.time()
     print("Number of keys in transposition table: ", len(transposition_table))
     
     print(eval, best_move)
-    print('Nega Max Search Time taken {}, with depth {}'.format(end_time - start_time, search_depth))
+    print('Iterative Deepening Search Time taken {}, with depth {}'.format(end_time - start_time, search_depth))
