@@ -1,5 +1,6 @@
 import chess
 import chess.polyglot
+import chess.svg
 from search import *
 from eval import *
 import argparse
@@ -11,6 +12,7 @@ opening_book = chess.polyglot.open_reader('bookfish.bin')
 def play(search_depth, color, transposition_table, verbose=0):
 
     board = chess.Board()
+    save_board_svg(board)
     move_number = 1
     while not board.is_game_over():
         print('----------------')
@@ -50,6 +52,7 @@ def play(search_depth, color, transposition_table, verbose=0):
             except:
                 print('Invalid move!')
                 continue
+        save_board_svg(board)
    
     print('----------------')
     
@@ -62,6 +65,13 @@ def play(search_depth, color, transposition_table, verbose=0):
     elif board.is_insufficient_material():
         print('Insufficient material!')
 
+def save_board_svg(board):
+    # Generate the SVG image of the current board
+    svg = chess.svg.board(board=board)
+
+    # Write the SVG content to a file
+    with open(f'board.svg', 'w') as f:
+        f.write(svg)
 
 
 if __name__ == '__main__':

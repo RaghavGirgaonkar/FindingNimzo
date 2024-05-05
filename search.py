@@ -42,17 +42,17 @@ def quiescence_search(board, alpha, beta, is_maximizing):
     After reaching depth limit, Search all capture moves until a quiet position is found.
     '''
     # #Get all capture moves
-    # capture_moves = []
-    # for move in board.legal_moves:
-    #     if board.is_capture(move):
-    #         capture_moves.append(move)
-    # return capture_moves
+    capture_moves = []
+    for move in board.legal_moves:
+        if board.is_capture(move):
+            capture_moves.append(move)
+    return capture_moves
 
     if is_maximizing:
         max_eval = -9999
         best_move = None
 
-        for move in board.legal_moves:
+        for move in capture_moves:
             board.push(move)
             eval, _ = quiescence_search(board, alpha, beta, False)
             board.pop()
@@ -68,7 +68,7 @@ def quiescence_search(board, alpha, beta, is_maximizing):
         min_eval = 9999
         best_move = None
 
-        for move in board.legal_moves:
+        for move in capture_moves:
             board.push(move)
             eval, _ = quiescence_search(board, alpha, beta, True)
             board.pop()
