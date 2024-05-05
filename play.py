@@ -12,7 +12,7 @@ opening_book = chess.polyglot.open_reader('bookfish.bin')
 def play(search_depth, color, transposition_table, verbose=0):
 
     board = chess.Board()
-    save_board_svg(board)
+    save_board_svg(board, not color)
     move_number = 1
     while not board.is_game_over():
         print('----------------')
@@ -31,7 +31,7 @@ def play(search_depth, color, transposition_table, verbose=0):
                 board.push(move)
             else:
                 print('Computer is thinking...')
-                # move_eval, move = alpha_beta_negamax_search(board, transposition_table,search_depth, -9999, 9999, 1 if color else -1)
+                
                 move_eval, move = iterative_deepening_search(board, transposition_table,search_depth,1 if color else -1)
                 board.push(move)
                 
@@ -53,7 +53,7 @@ def play(search_depth, color, transposition_table, verbose=0):
             except:
                 print('Invalid move!')
                 continue
-        save_board_svg(board)
+        save_board_svg(board, not color)
    
     print('----------------')
     
@@ -66,9 +66,9 @@ def play(search_depth, color, transposition_table, verbose=0):
     elif board.is_insufficient_material():
         print('Insufficient material!')
 
-def save_board_svg(board):
+def save_board_svg(board, color=chess.WHITE):
     # Generate the SVG image of the current board
-    svg = chess.svg.board(board=board)
+    svg = chess.svg.board(board=board, orientation=color)
 
     # Write the SVG content to a file
     with open(f'board.svg', 'w') as f:
@@ -99,6 +99,6 @@ if __name__ == '__main__':
         print('Invalid color!')
     
     # save transposition table
-    with open('transposition_table.pkl', 'wb') as f:
-        pickle.dump(transposition_table, f)
+    # with open('transposition_table.pkl', 'wb') as f:
+    #     pickle.dump(transposition_table, f)
 

@@ -1,9 +1,11 @@
+from multiprocessing import Pool
 from eval import evaluate_board
 from hyperparameters import *
 from moveOrdering import *
+import multiprocessing
+import chess.polyglot
 import argparse
 import chess
-import chess.polyglot
 import time
 
 def minimax_search(board, depth, is_maximizing):
@@ -138,18 +140,18 @@ def alpha_beta_negamax_search(board, transposition_table, depth, alpha, beta, tu
             transposition_table[hash] = eval
             return eval, None
 
-    if board.is_game_over():
-        hash = chess.polyglot.zobrist_hash(board)
-        eval = turnMultiplier*evaluate_board(board)
-        transposition_table[hash] = eval
-        return eval, None
+    # if board.is_game_over():
+    #     hash = chess.polyglot.zobrist_hash(board)
+    #     eval = turnMultiplier*evaluate_board(board)
+    #     transposition_table[hash] = eval
+    #     return eval, None
 
-    if depth == 0:
-        hash = chess.polyglot.zobrist_hash(board)
-        if hash not in transposition_table:
-            eval = turnMultiplier*evaluate_board(board)
-            transposition_table[hash] = eval
-            eval, best_move = quiescence_search(board, alpha, beta, turnMultiplier) 
+    # if depth == 0:
+    #     hash = chess.polyglot.zobrist_hash(board)
+    #     if hash not in transposition_table:
+    #         eval = turnMultiplier*evaluate_board(board)
+    #         transposition_table[hash] = eval
+    #         eval, best_move = quiescence_search(board, alpha, beta, turnMultiplier) 
             
 
     # if depth <= 1:  # Apply quiescence search at lower depths
@@ -181,7 +183,7 @@ def iterative_deepening_search(board, transposition_table, max_depth, turnMultip
     best_move = None
     for depth in range(1, max_depth):
         eval, best_move = alpha_beta_negamax_search(board, transposition_table, depth, -9999, 9999, turnMultiplier)
-        # print("Depth:", depth, "Eval:", eval, "Best Move:", best_move)
+
     return eval, best_move
 
 
@@ -195,25 +197,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
     transposition_table = {}
-    eval, best_move = alpha_beta_pruning_search(board, transposition_table, search_depth, -9999, 9999, True)
-    # eval, best_move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999, 1)
-    end_time = time.time()
-    print("Number of keys in transposition table: ", len(transposition_table))
-    
-    print(eval, best_move)
-    print('Time taken {}, with depth {}'.format(end_time - start_time, search_depth))
-    # start_time = time.time()
-    # transposition_table = {}
-    # # eval, best_move = alpha_beta_pruning_search(board, transposition_table, search_depth, -9999, 9999, True)
-    # eval, best_move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999, 1)
-    # end_time = time.time()
-    # print("Number of keys in transposition table: ", len(transposition_table))
-    
-    # print(eval, best_move)
-    # print('Nega Max Search Time taken {}, with depth {}'.format(end_time - start_time, search_depth))
-    start_time = time.time()
-    transposition_table = {}
-    # eval, best_move = alpha_beta_pruning_search(board, transposition_table, search_depth, -9999, 9999, True)
+
     eval, best_move = iterative_deepening_search(board, transposition_table, search_depth, 1)
     end_time = time.time()
     print("Number of keys in transposition table: ", len(transposition_table))

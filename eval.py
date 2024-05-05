@@ -1,25 +1,12 @@
 import chess
 from hyperparameters import *
 
-
 def evaluate_board(board):
-    BONUS_TABLES = {'p': PAWN_BONUS_TABLE_BLACK, 
-                    'n': KNIGHT_BONUS_TABLE_BLACK, 
-                    'b': BISHOP_BONUS_TABLE_BLACK, 
-                    'r': ROOK_BONUS_TABLE_BLACK, 
-                    'q': QUEEN_BONUS_TABLE_BLACK, 
-                    'k': KING_BONUS_TABLE_BLACK,
-                    'P': PAWN_BONUS_TABLE_WHITE,
-                    'N': KNIGHT_BONUS_TABLE_WHITE,
-                    'B': BISHOP_BONUS_TABLE_WHITE,
-                    'R': ROOK_BONUS_TABLE_WHITE,
-                    'Q': QUEEN_BONUS_TABLE_WHITE,
-                    'K': KING_BONUS_TABLE_WHITE}
-    
     PIECE_MAP = board.piece_map()
     bonus_score = 0
     material_score = 0
     mobility_score = 0
+    pawnless_total_material = 0
 
     if board.is_checkmate():
         return -GAME_LOSS_SCORE if board.turn else GAME_LOSS_SCORE
@@ -32,8 +19,21 @@ def evaluate_board(board):
         piece_symbol = piece.symbol()
         
         color_multiplier = 1 if piece.color == chess.WHITE else -1
-        bonus_score += color_multiplier * BONUS_TABLES[piece_symbol][63-square]
         material_score += color_multiplier * PIECE_VALUES[piece_symbol]
+
+        if piece_symbol != 'P' and piece_symbol != 'p':
+            pawnless_total_material += PIECE_VALUES[piece_symbol]
+
+    if pawnless_total_material < ENDGAME_THRESHOLD:
+        BONUS = BONUS_TABLES_END
+    else:
+        BONUS = BONUS_TABLES
+
+    for square, piece in PIECE_MAP.items():
+        piece_symbol = piece.symbol()
+        
+        color_multiplier = 1 if piece.color == chess.WHITE else -1
+        bonus_score += color_multiplier * BONUS[piece_symbol][63-square]
         
     mobility_score = calculate_mobility(board)
 

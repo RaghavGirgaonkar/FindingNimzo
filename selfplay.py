@@ -98,5 +98,5 @@ if __name__ == '__main__':
     selfplay(args.depth, transposition_table, args.verbose)
     
     # save transposition table
-    with open('transposition_table.pkl', 'wb') as f:
-        pickle.dump(transposition_table, f)
+    # with open('transposition_table.pkl', 'wb') as f:
+    #     pickle.dump(transposition_table, f)
