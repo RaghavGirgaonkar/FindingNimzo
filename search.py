@@ -100,7 +100,7 @@ def alpha_beta_pruning_search(board, transposition_table, depth, alpha, beta, is
             board.push(move)
             eval, _ = alpha_beta_pruning_search(board, transposition_table, depth - 1, alpha, beta, False)
             board.pop()
-            if eval > max_eval:
+            if eval >= max_eval:
                 max_eval = eval
                 best_move = move
             alpha = max(alpha, eval)
@@ -116,7 +116,7 @@ def alpha_beta_pruning_search(board, transposition_table, depth, alpha, beta, is
             board.push(move)
             eval, _ = alpha_beta_pruning_search(board, transposition_table, depth - 1, alpha, beta, True)
             board.pop()
-            if eval < min_eval:
+            if eval <= min_eval:
                 min_eval = eval
                 best_move = move
             beta = min(beta, eval)
@@ -166,11 +166,11 @@ def alpha_beta_negamax_search(board, transposition_table, depth, alpha, beta, tu
         eval, _ = alpha_beta_negamax_search(board, transposition_table, depth -1, -beta, -alpha, -turnMultiplier)
         eval *= -1
         board.pop()
-        if eval > maxScore:
+        if eval >= maxScore:
             maxScore = eval
             best_move = move
             #Pruning
-        if maxScore > alpha:
+        if maxScore >= alpha:
             alpha = maxScore
         if alpha >= beta:
             break

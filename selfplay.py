@@ -20,7 +20,7 @@ def selfplay(search_depth, transposition_table, verbose=0):
         if verbose:
             print(board)
             position_eval = evaluate_board(board)
-            print('Position Eval:', position_eval)
+            print('Position Eval:', position_eval/100)
 
         if board.turn == chess.WHITE:
             time.sleep(1)
@@ -31,12 +31,12 @@ def selfplay(search_depth, transposition_table, verbose=0):
                 board.push(move)
             else:
                 print('White is thinking...')
-                move_eval, move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999, 1)
+                move_eval, move = iterative_deepening_search(board, transposition_table, search_depth, 1)
                 board.push(move)
 
             if verbose:
                 position_eval = evaluate_board(board)
-                print('Position Eval:', position_eval)
+                print('Position Eval:', position_eval/100)
             print('White moves:', move)
                 
         else:
@@ -48,12 +48,12 @@ def selfplay(search_depth, transposition_table, verbose=0):
                 board.push(move)
             else:
                 print('Black is thinking...')
-                move_eval, move = alpha_beta_negamax_search(board, transposition_table, search_depth, -9999, 9999,  -1)
+                move_eval, move = iterative_deepening_search(board, transposition_table, search_depth, -1)
                 board.push(move)
 
             if verbose:
                 position_eval = evaluate_board(board)
-                print('Position Eval:', position_eval)
+                print('Position Eval:', position_eval/100)
             print('Black moves:', move)
 
             move_number += 1
